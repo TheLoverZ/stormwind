@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import re
+import bcrypt
 import httplib
 import traceback
 
 import tornado.web
 import tornado.locale
+
+EMAIL_REGEX = re.compile(r"(?:^|\s)[-a-z0-9_.+]+@(?:[-a-z0-9]+\.)+[a-z]{2,6}(?:\s|$)", re.IGNORECASE)
 
 class BaseHandler(tornado.web.RequestHandler):
     ''' This is Stormwind Base Handler '''
@@ -37,6 +41,18 @@ class BaseHandler(tornado.web.RequestHandler):
             return
         msg = httplib.responses[status_code]
         self.render("error.html", locals())
+    def get_argument_list(self, names, translated, default = "none"):
+        value_list = []
+        for name, translate in zip(names, translated):
+            if default != "none":
+                value_list.append((name, translate, self.get_argument(name, default = default)))
+            else:
+                value_list.append((name, translate, self.get_argument(name)))
+        return value_list
+    def check_email(self, email):
+        return EMAIL_REGEX.match(email)
+    def encrypt_password(self, password):
+        return bcrypt.hashpw(password, self.settings['bcrypt_salt'])
     @property
     def db(self):
         return self.application.db

@@ -2,3 +2,5 @@ Jinja2
 SQLAlchemy
 tornado
 mysql-python
+simplejson
+py-bcrypt
