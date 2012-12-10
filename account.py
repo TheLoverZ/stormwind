@@ -14,7 +14,7 @@ class SigninHandler(BaseHandler):
     def get(self):
         self.render("account.signin.html")
 
-class SigninGoogleHandler(BaseHandler, tornado.auth.GoogleMixin):
+class SigninGoogleHandler(BaseHandler, tornado.auth.GoogleMixin, MemberDBMixin):
     @tornado.web.asynchronous
     def get(self):
         if self.get_argument("openid.mode", None):
@@ -25,7 +25,13 @@ class SigninGoogleHandler(BaseHandler, tornado.auth.GoogleMixin):
     def _on_auth(self, user):
         if not user:
             raise tornado.web.HTTPError(500, "Google auth failed")
-        # TODO: query database to check whether having this user
+        member = self.select_member_by_email_lower(user['email'].lower())
+        if member:
+            auth = self.create_auth(member.id)
+            self.set_secure_cookie("auth", auth.secret)
+            self.set_secure_cookie("uid", str(auth.member_id))
+            self.redirect("/")
+            return
         self.set_secure_cookie("google_auth", json.dumps(user))
         self.redirect("/signup/google")
 
@@ -77,6 +83,7 @@ class SignupHandler(BaseHandler, MemberDBMixin):
         member = Member(email, username, self.encrypt_password(password)) 
         self.db.add(member)
         self.db.commit()
+        self.clear_cookie("google_auth")
         auth = self.create_auth(member.id)
         self.set_secure_cookie("auth", auth.secret)
         self.set_secure_cookie("uid", str(auth.member_id))
