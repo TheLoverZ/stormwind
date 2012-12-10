@@ -4,9 +4,13 @@ import re
 import bcrypt
 import httplib
 import traceback
+from sqlalchemy.orm.exc import NoResultFound
 
 import tornado.web
 import tornado.locale
+
+from stormwind.db.models import Auth
+from stormwind.db.models import Member
 
 EMAIL_REGEX = re.compile(r"(?:^|\s)[-a-z0-9_.+]+@(?:[-a-z0-9]+\.)+[a-z]{2,6}(?:\s|$)", re.IGNORECASE)
 
@@ -18,6 +22,21 @@ class BaseHandler(tornado.web.RequestHandler):
         if self.current_user:
             return tornado.locale.get(self.current_user.locale)
         return self.get_browser_locale()
+    def get_current_user(self):
+        auth = self.get_secure_cookie("auth")
+        member_id = self.get_secure_cookie("uid")
+        member = None
+        if auth and member_id:
+            try:
+                auth = self.db.query(Auth).filter_by(secret = auth).filter_by(member_id = member_id).one()
+            except NoResultFound:
+                auth = None
+            if auth:
+                member = self.db.query(Member).get(auth.member_id)
+                if not member:
+                    self.clear_cookie("auth")
+                    self.clear_cookie("uid")
+        return member
     def render(self, name, kwargs = {}):
         ''' Render page using Jinja2 '''
         if "self" in kwargs.keys():

@@ -80,7 +80,7 @@ class SignupHandler(BaseHandler, MemberDBMixin):
                 self.redirect("/signin/google")
             self.render("account.signup.html", locals())
             return
-        member = Member(email, username, self.encrypt_password(password)) 
+        member = Member(email, username, self.encrypt_password(password), self.get_browser_locale().code) 
         self.db.add(member)
         self.db.commit()
         self.clear_cookie("google_auth")

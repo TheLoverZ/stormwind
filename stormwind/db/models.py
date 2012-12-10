@@ -28,13 +28,15 @@ class Member(Base, baseModule):
     password = Column(UnicodeText)
     email = Column(UnicodeText)
     email_lower = Column(UnicodeText)
+    locale = Column(String(255))
 
-    def __init__(self, email, username, password):
+    def __init__(self, email, username, password, locale):
         self.username = username
         self.username_lower = username.lower()
         self.email = email
         self.email_lower = email.lower()
         self.password = password 
+        self.locale = locale
 
 class Auth(Base, baseModule):
     __tablename__ = "auth"

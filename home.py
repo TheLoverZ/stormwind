@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from stormwind.base import BaseHandler
 
 class HomeHandler(BaseHandler):
