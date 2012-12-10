@@ -89,9 +89,15 @@ class SignupHandler(BaseHandler, MemberDBMixin):
         self.set_secure_cookie("uid", str(auth.member_id))
         self.redirect("/")
 
+class SignoutHandler(BaseHandler):
+    def get(self):
+        self.clear_all_cookies()
+        self.redirect("/")
+
 route = [
     (r'/signin', SigninHandler), 
     (r'/signin/google', SigninGoogleHandler), 
     (r'/signup', SignupHandler), 
     (r'/signup/google', SignupHandler), 
+    (r'/signout', SignoutHandler), 
 ]
