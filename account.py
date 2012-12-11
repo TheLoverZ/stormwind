@@ -31,8 +31,8 @@ class SigninHandler(BaseHandler, MemberDBMixin, tornado.auth.GoogleMixin):
             if len(value) > 32:
                 error.append(self._("%s is too long." % translate))
                 continue
-        username = args[1][2]
-        password = args[2][2]
+        username = args[0][2]
+        password = args[1][2]
         if '@' in username:
             member = self.select_member_by_email_lower(email.lower())
         else:

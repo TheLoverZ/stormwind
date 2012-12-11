@@ -144,25 +144,56 @@ button, .btn {
     -moz-transition: width .2s linear;
 }
 
-.btn-google {
+.sns-login {
     float: left; 
     width: 60px; 
+    background-color: transparent; 
+    padding: 0; 
+    transition: height .2s linear; 
+    -webkit-transition: height .2s linear; 
+    -moz-transition: height .2s linear;
+    position: relative; 
+    overflow: hidden; 
+    height: 60px; 
+}
+
+.sns-login .btn-google {
+    width: 260px; 
     height: 60px; 
     background-color: #4385F4; 
     background-image: url('/static/img/signin-google.png'); 
     background-repeat: no-repeat; 
-    padding: 0; 
-    transition: width .2s linear; 
-    -webkit-transition: width .2s linear; 
-    -moz-transition: width .2s linear;
 }
 
-.google-hover .btn-google {
-    width: 260px; 
+.google-hover .sns-login {
+    height: 240px; 
 }
 
 .google-hover button {
-    width: 140px; 
+}
+.sns-login .other-sns {
+}
+.sns-login .other-sns a {
+    width: 60px; 
+    height: 60px; 
+}
+.other-sns .btn-renren {
+    background-color: #005EAC; 
+    background-image: url('/static/img/signin-renren.png'); 
+}
+.other-sns .btn-weibo {
+    background-color: #E32529; 
+    background-image: url('/static/img/signin-weibo.png'); 
+}
+.other-sns .btn-tencent {
+    background-color: #E32529; 
+    background-image: url('/static/img/signin-tencent.png'); 
+}
+.google-hover .sns-login .btn {
+    opacity: 0.5; 
+}
+.google-hover .sns-login .btn:hover {
+    opacity: 1; 
 }
     </style>
     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js" type="text/javascript"></script>
@@ -176,7 +207,7 @@ $(document).ready(function() {
     input.focusout(function() {
         form_line.removeClass("active"); 
     }); 
-    $(".btn-google").hover(function() {
+    $(".sns-login").hover(function() {
         $(this).parents(".form-line").addClass("google-hover"); 
     }, function() {
         form_line.removeClass("google-hover"); 
@@ -223,7 +254,14 @@ $(document).ready(function() {
         <div class="form-line form-line-post">
             <div class="line-container">
                 <button type="submit" class="btn btn-green">Sign in</button>
-                <a href="/signin/google" class="btn btn-google" title="Sign in with Google"></a>
+                <div class="sns-login">
+                    <a href="/signin/google" class="btn btn-google" title="Sign in with Google"></a>
+                    <div class="other-sns">
+                        <a href="/signin/weibo" class="btn btn-weibo" title="Sign in with Weibo"></a>
+                        <a href="/signin/renren" class="btn btn-renren" title="Sign in with Renren"></a>
+                        <a href="/signin/tencent" class="btn btn-tencent" title="Sign in with Tencent"></a>
+                    </div>
+                </div>
                 <div class="clearfix"></div>
             </div>
         </div>
