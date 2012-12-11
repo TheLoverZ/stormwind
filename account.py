@@ -8,6 +8,7 @@ import tornado.auth
 
 from stormwind.db import MemberDBMixin
 from stormwind.db.models import Member
+from stormwind.ext.renren import RenrenMixin
 from stormwind.base import BaseHandler
 
 class SigninHandler(BaseHandler):
@@ -94,9 +95,22 @@ class SignoutHandler(BaseHandler):
         self.clear_all_cookies()
         self.redirect("/")
 
+class SigninRenrenHandler(BaseHandler, RenrenMixin):
+    def _on_auth(self, user):
+        logging.info(user)
+        self.finish()
+    @tornado.web.asynchronous
+    def get(self):
+        callback_uri = self.settings['base_domain'] + '/signin/renren'
+        if self.get_argument("code", None):
+            self.get_authenticated_user(self.async_callback(self._on_auth), callback_uri)
+            return
+        self.authorize_redirect(callback_uri = callback_uri)
+
 route = [
     (r'/signin', SigninHandler), 
     (r'/signin/google', SigninGoogleHandler), 
+    (r'/signin/renren', SigninRenrenHandler), 
     (r'/signup', SignupHandler), 
     (r'/signup/google', SignupHandler), 
     (r'/signout', SignoutHandler), 
