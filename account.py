@@ -11,9 +11,40 @@ from stormwind.db.models import Member
 from stormwind.ext.renren import RenrenMixin
 from stormwind.base import BaseHandler
 
-class SigninHandler(BaseHandler):
+class SigninHandler(BaseHandler, MemberDBMixin, tornado.auth.GoogleMixin):
     def get(self):
         self.render("account.signin.html")
+    def post(self):
+        args = self.get_argument_list(["email", "username", "password"], \
+                                      [self._("Email"), self._("Username"), self._("Password")], \
+                                      None)
+        error = []
+        for name, translate, value in args:
+            if not value:
+                error.append(self._("%s is required." % translate))
+                continue
+            if len(value) < 4:
+                error.append(self._("%s is too short." % translate))
+                continue
+            if len(value) > 32:
+                error.append(self._("%s is too long." % translate))
+                continue
+            if name == "email" and not self.check_email(value):
+                error.append(self._("Email address is invaild."))
+                continue
+        username = args[1][2]
+        password = args[2][2]
+        member = self.select_member_by_username_lower(username)
+        if member.password == self.encrypt_password(password):
+            auth = self.create_auth(member.id)
+            self.set_secure_cookie("auth", auth.secret)
+            self.set_secure_cookie("uid", str(auth.member_id))
+            self.redirect("/")
+        else:
+            error.append(self._("username/password not match"))
+            if error:
+                self.render("account.signin.html", locals())
+                return
 
 class SigninGoogleHandler(BaseHandler, tornado.auth.GoogleMixin, MemberDBMixin):
     @tornado.web.asynchronous
