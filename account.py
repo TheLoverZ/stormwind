@@ -8,7 +8,9 @@ import tornado.auth
 
 from stormwind.db import MemberDBMixin
 from stormwind.db.models import Member
+from stormwind.ext.weibo import WeiboMixin
 from stormwind.ext.renren import RenrenMixin
+from stormwind.ext.tencent import TencentMixin
 from stormwind.base import BaseHandler
 
 class SigninHandler(BaseHandler):
@@ -107,10 +109,47 @@ class SigninRenrenHandler(BaseHandler, RenrenMixin):
             return
         self.authorize_redirect(callback_uri = callback_uri)
 
+class SigninTencentHandler(BaseHandler, TencentMixin):
+    def _on_auth(self, user):
+        logging.info(user)
+        self.finish()
+    @tornado.web.asynchronous
+    def get(self):
+        redirect_uri = self.settings['base_domain'] + '/signin/tencent'
+        if self.get_argument("code", None):
+            self.get_authenticated_user(redirect_uri = redirect_uri, \
+                                        code = self.get_argument("code", None), \
+                                        callback = self.async_callback(self._on_auth))
+            return
+        self.authorize_redirect(redirect_uri = redirect_uri, \
+                                client_id = self.settings["tencent_consumer_key"], \
+                                extra_params = {"response_type" : "code"})
+
+class SigninWeiboHandler(BaseHandler, WeiboMixin):
+    @tornado.web.asynchronous
+    def get(self):
+        redirect_uri = self.settings['base_domain'] + '/signin/weibo'
+        if self.get_argument("code", False):
+            self.get_authenticated_user(
+                redirect_uri = redirect_uri,
+                client_id=self.settings["weibo_client_id"],
+                client_secret=self.settings["weibo_client_secret"],
+                code=self.get_argument("code"),
+                callback=self.async_callback(self._on_login))
+            return
+        self.authorize_redirect(redirect_uri=redirect_uri,
+                              client_id=self.settings["weibo_client_id"],
+                              extra_params={"response_type": "code"})
+    def _on_login(self, user):
+        logging.error(user)
+        self.finish()
+
 route = [
     (r'/signin', SigninHandler), 
     (r'/signin/google', SigninGoogleHandler), 
     (r'/signin/renren', SigninRenrenHandler), 
+    (r'/signin/tencent', SigninTencentHandler), 
+    (r'/signin/weibo', SigninWeiboHandler), 
     (r'/signup', SignupHandler), 
     (r'/signup/google', SignupHandler), 
     (r'/signout', SignoutHandler), 
