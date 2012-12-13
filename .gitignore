@@ -2,3 +2,4 @@
 local_config.py
 venv/
 .DS_Store
+jquery-1.8.3.min.js
