@@ -50,3 +50,28 @@ class Auth(Base, baseModule):
     def __init__(self, member_id, secret):
         self.member_id = member_id
         self.secret = secret
+
+class List(Base, baseModule):
+    __tablename__ = "list"
+    name = Column(UnicodeText)
+    description = Column(UnicodeText, default = u"")
+    slug = Column(String(255), default = "")
+    member_id = Column(Integer, ForeignKey("member.id"))
+    member = relation("Member")
+
+    def __init__(self, name, member_id):
+        self.name = name
+        self.member_id = member_id
+
+class Entry(Base, baseModule):
+    __tablename__ = "entry"
+    type = Column(Integer)
+    content = Column(UnicodeText) 
+    list_id = Column(Integer, ForeignKey("list.id"))
+    list = relation("List")
+
+    def __init__(self, type, content, list_id):
+        self.type = type
+        self.content = content
+        self.list_id = list_id
+

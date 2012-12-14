@@ -5,6 +5,7 @@ import logging
 import tornado.web
 
 import home
+import llist
 import account
 
 from stormwind.base import BaseHandler
@@ -15,5 +16,6 @@ class NotFoundHandler(BaseHandler):
 
 route = []
 route.extend(home.route)
+route.extend(llist.route)
 route.extend(account.route)
 route.append((r'(.*)', NotFoundHandler))
