@@ -29,6 +29,9 @@ class Member(Base, baseModule):
     email = Column(UnicodeText)
     email_lower = Column(UnicodeText)
     locale = Column(String(255))
+    weibo_id = Column(String(255), default = "")
+    renren_id = Column(String(255), default = "")
+    tencent_id = Column(String(255), default = "")
 
     def __init__(self, email, username, password, locale):
         self.username = username

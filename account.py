@@ -69,6 +69,21 @@ class SigninGoogleHandler(BaseHandler, tornado.auth.GoogleMixin, MemberDBMixin):
         self.redirect("/signup/google")
 
 class SignupHandler(BaseHandler, MemberDBMixin):
+    def _get_auth(self):
+        ''' Return auth_type, auth_key '''
+        google = _get_google_auth()
+        if google:
+            return "google", google
+        weibo = _get_weibo_auth()
+        if weibo:
+            return "weibo", weibo
+        renren = _get_renren_auth()
+        if renren:
+            return "renren", renren
+        tencent = _get_tencent_auth()
+        if tencent:
+            return "tencent", tencent
+        return "", None
     def _get_google_auth(self):
         try:
             google_auth = json.loads(self.get_secure_cookie("google_auth"))
@@ -77,10 +92,34 @@ class SignupHandler(BaseHandler, MemberDBMixin):
         except TypeError:
             google_auth = None
         return google_auth
+    def _get_weibo_auth(self):
+        try:
+            weibo_auth = json.loads(self.get_secure_cookie("weibo_auth"))
+        except json.JSONDecodeError:
+            weibo_auth = None
+        except TypeError:
+            weibo_auth = None
+        return weibo_auth
+    def _get_renren_auth(self):
+        try:
+            renren_auth = json.loads(self.get_secure_cookie("renren_auth"))
+        except json.JSONDecodeError:
+            renren_auth = None
+        except TypeError:
+            renren_auth = None
+        return renren_auth
+    def _get_tencent_auth(self):
+        try:
+            tencent_auth = json.loads(self.get_secure_cookie("tencent_auth"))
+        except json.JSONDecodeError:
+            tencent_auth = None
+        except TypeError:
+            tencent_auth = None
+        return tencent_auth
     def get(self):
-        google_auth = self._get_google_auth()
-        if not google_auth:
-            self.redirect("/signin/google")
+        email = None
+        # Google Auth
+        auth_type, auth = self._get_auth()
         self.render("account.signup.html", locals())
     def post(self):
         args = self.get_argument_list(["email", "username", "password"], \

@@ -36,7 +36,18 @@ class MemberDBMixin(object):
     @protect_one
     def select_member_by_email_lower(self, email):
         return self.db.query(Member).filter_by(email_lower = email.lower()).one()
+    @protect_one
+    def select_member_by_weibo_id(self, weibo_id):
+        return self.db.query(Member).filter_by(weibo_id = weibo_id).one()
+    @protect_one
+    def select_member_by_renren_id(self, renren_id):
+        return self.db.query(Member).filter_by(renren_id = renren_id).one()
+    @protect_one
+    def select_member_by_tencent_id(self, tencent_id):
+        return self.db.query(Member).filter_by(tencent_id = tencent_id).one()
     @insert
     def create_auth(self, member_id):
         random = binascii.b2a_hex(uuid.uuid4().bytes)
         return Auth(member_id, random)
+
+
