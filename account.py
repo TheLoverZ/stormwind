@@ -38,7 +38,9 @@ class SigninHandler(BaseHandler, MemberDBMixin, tornado.auth.GoogleMixin):
             member = self.select_member_by_email_lower(email.lower())
         else:
             member = self.select_member_by_username_lower(username.lower())
-        if member.password != self.encrypt_password(password):
+        if member == None:
+            error.append(self._("User not exists."))
+        elif member.password != self.encrypt_password(password):
             error.append(self._("Wrong Username and password combination."))
         if error:
             self.render("account.signin.html", locals())
