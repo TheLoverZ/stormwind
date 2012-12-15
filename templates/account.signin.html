@@ -25,6 +25,9 @@
     50% {background-color: #E47575; }
     100% {background-color: transparent; }
 }
+.form-line-input.line-hover {
+    background-color: #ACBCD5; 
+}
 html {
     background-color: #E9E9E9;
     font-family: 'Monda', sans-serif;
@@ -107,6 +110,10 @@ button, .btn {
     background-color: #54BD23;  
 }
 
+.btn-green:hover {
+    background-color: #53C71D;
+}
+
 .form-line.active {
     background-color: #72A4EE;
 }
@@ -149,9 +156,6 @@ button, .btn {
     width: 60px; 
     background-color: transparent; 
     padding: 0; 
-    transition: height .2s linear; 
-    -webkit-transition: height .2s linear; 
-    -moz-transition: height .2s linear;
     position: relative; 
     overflow: hidden; 
     height: 60px; 
@@ -176,24 +180,34 @@ button, .btn {
 .sns-login .other-sns a {
     width: 60px; 
     height: 60px; 
+    opacity: 0; 
 }
-.other-sns .btn-renren {
+.google-hover .other-sns a {
+    opacity: 1;
+    transition: opacity .3s linear; 
+    -webkit-transition: opacity .3s linear; 
+    -moz-transition: opacity .3s linear;
+}
+.sns-login .other-sns .btn-renren {
     background-color: #005EAC; 
     background-image: url('/static/img/signin-renren.png'); 
+    transition-delay: .3s; 
+    -webkit-transition-delay: .3s; 
+    -moz-transition-delay: .3s; 
 }
-.other-sns .btn-weibo {
+.sns-login .other-sns .btn-weibo {
     background-color: #E32529; 
     background-image: url('/static/img/signin-weibo.png'); 
 }
-.other-sns .btn-tencent {
+.sns-login .other-sns .btn-tencent {
     background-color: #E32529; 
     background-image: url('/static/img/signin-tencent.png'); 
+    transition-delay: .6s; 
+    -webkit-transition-delay: .6s; 
+    -moz-transition-delay: .6s; 
 }
-.google-hover .sns-login .btn {
-    opacity: 0.5; 
-}
-.google-hover .sns-login .btn:hover {
-    opacity: 1; 
+.google-hover .other-sns {
+    display: block; 
 }
     </style>
     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js" type="text/javascript"></script>
@@ -206,6 +220,11 @@ $(document).ready(function() {
     }); 
     input.focusout(function() {
         form_line.removeClass("active"); 
+    }); 
+    input.hover(function() {
+        $(this).parents(".form-line").addClass("line-hover"); 
+    }, function() {
+        form_line.removeClass("line-hover");
     }); 
     $(".sns-login").hover(function() {
         $(this).parents(".form-line").addClass("google-hover"); 

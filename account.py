@@ -5,6 +5,7 @@ import simplejson as json
 
 import tornado.web
 import tornado.auth
+from tornado.web import HTTPError
 
 from stormwind.db import MemberDBMixin
 from stormwind.db.models import Member
@@ -71,16 +72,16 @@ class SigninGoogleHandler(BaseHandler, tornado.auth.GoogleMixin, MemberDBMixin):
 class SignupHandler(BaseHandler, MemberDBMixin):
     def _get_auth(self):
         ''' Return auth_type, auth_key '''
-        google = _get_google_auth()
+        google = self._get_google_auth()
         if google:
             return "google", google
-        weibo = _get_weibo_auth()
+        weibo = self._get_weibo_auth()
         if weibo:
             return "weibo", weibo
-        renren = _get_renren_auth()
+        renren = self._get_renren_auth()
         if renren:
             return "renren", renren
-        tencent = _get_tencent_auth()
+        tencent = self._get_tencent_auth()
         if tencent:
             return "tencent", tencent
         return "", None
@@ -169,8 +170,10 @@ class SignoutHandler(BaseHandler):
         self.clear_all_cookies()
         self.redirect("/")
 
-class SigninRenrenHandler(BaseHandler, RenrenMixin):
+class SigninRenrenHandler(BaseHandler, RenrenMixin, MemberDBMixin):
     def _on_auth(self, user):
+        if not user:
+            raise HTTPError(500, "Sign in with Renren failed.")
         member = self.select_member_by_renren_id(user['user']['id'])
         if member:
             auth = self.create_auth(member.id)
@@ -178,7 +181,7 @@ class SigninRenrenHandler(BaseHandler, RenrenMixin):
             self.set_secure_cookie("uid", str(auth.member_id))
             self.redirect("/")
             return
-        self.set_secure_cookie("renren_auth", user['user']['id'])
+        self.set_secure_cookie("renren_auth", str(user['user']['id']))
         self.redirect("/signup")
     @tornado.web.asynchronous
     def get(self):
@@ -188,8 +191,10 @@ class SigninRenrenHandler(BaseHandler, RenrenMixin):
             return
         self.authorize_redirect(callback_uri = callback_uri)
 
-class SigninTencentHandler(BaseHandler, TencentMixin):
+class SigninTencentHandler(BaseHandler, TencentMixin, MemberDBMixin):
     def _on_auth(self, user):
+        if not user:
+            raise HTTPError(500, "Sign in with Tencent failed.")
         member = self.select_member_by_tencent_id(user['access_token']['openid'])
         if member:
             auth = self.create_auth(member.id)
@@ -211,7 +216,7 @@ class SigninTencentHandler(BaseHandler, TencentMixin):
                                 client_id = self.settings["tencent_consumer_key"], \
                                 extra_params = {"response_type" : "code"})
 
-class SigninWeiboHandler(BaseHandler, WeiboMixin):
+class SigninWeiboHandler(BaseHandler, WeiboMixin, MemberDBMixin):
     @tornado.web.asynchronous
     def get(self):
         redirect_uri = self.settings['base_domain'] + '/signin/weibo'
@@ -227,6 +232,8 @@ class SigninWeiboHandler(BaseHandler, WeiboMixin):
                               client_id=self.settings["weibo_client_id"],
                               extra_params={"response_type": "code"})
     def _on_login(self, user):
+        if not user:
+            raise HTTPError(500, "Sign in with Weibo failed.")
         member = self.select_member_by_weibo_id(user['id'])
         if member:
             auth = self.create_auth(member.id)
@@ -234,7 +241,7 @@ class SigninWeiboHandler(BaseHandler, WeiboMixin):
             self.set_secure_cookie("uid", str(auth.member_id))
             self.redirect("/")
             return
-        self.set_secure_cookie("weibo_auth", user['id'])
+        self.set_secure_cookie("weibo_auth", str(user['id']))
         self.redirect('/signup')
 
 route = [
