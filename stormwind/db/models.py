@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from sqlalchemy import Column
 from sqlalchemy import String
 from sqlalchemy import Integer
@@ -40,6 +42,14 @@ class Member(Base, baseModule):
         self.email_lower = email.lower()
         self.password = password 
         self.locale = locale
+        logging.info(email)
+        email_name, email_domain = email.split('@') 
+        if email_domain == "user.weibo.com":
+            self.weibo_id = email_name
+        elif email_domain == "user.renren.com":
+            self.renren_id = email_name
+        elif email_domain == "user.t.qq.com":
+            self.tencent_id = email_name
 
 class Auth(Base, baseModule):
     __tablename__ = "auth"

@@ -185,21 +185,6 @@ $(document).ready(function() {
                 <legend>Sign up</legend>
             </div>
         </div>
-        {% if auth_type %}
-        <div class="form-line">
-            <div class="line-container {{ auth_type }} auth">
-                {% if auth_type != 'google' %}
-                <div class="avatar">
-                    <img src="{{ auth.avatar }}" />
-                </div>
-                {% endif %}
-                <div class="auth-info">
-                    <h3 class="auth-name">{{ auth.name }}</h3>
-                    <span class="auth-id">{{ auth.id }}</span>
-                </div>
-            </div>
-        </div>
-        {% endif %}
         <div class="form-line form-line-input {% if email %}form-line-input-disabled{% endif %}">
             <div class="line-container">
                 <input type="TEXT" name="email" placeholder="Email" {% if email %} value="{{ email }}" readonly {% endif %}/>

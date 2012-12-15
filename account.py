@@ -66,7 +66,8 @@ class SigninGoogleHandler(BaseHandler, tornado.auth.GoogleMixin, MemberDBMixin):
             self.set_secure_cookie("uid", str(auth.member_id))
             self.redirect("/")
             return
-        self.set_secure_cookie("google_auth", json.dumps(user))
+        self.clear_all_cookies()
+        self.set_secure_cookie("google_auth", user['email'])
         self.redirect("/signup")
 
 class SignupHandler(BaseHandler, MemberDBMixin):
@@ -84,43 +85,28 @@ class SignupHandler(BaseHandler, MemberDBMixin):
         tencent = self._get_tencent_auth()
         if tencent:
             return "tencent", tencent
-        return "", None
+        return None
     def _get_google_auth(self):
-        try:
-            google_auth = json.loads(self.get_secure_cookie("google_auth"))
-        except json.JSONDecodeError:
-            google_auth = None
-        except TypeError:
-            google_auth = None
+        google_auth = self.get_secure_cookie("google_auth")
         return google_auth
     def _get_weibo_auth(self):
-        try:
-            weibo_auth = json.loads(self.get_secure_cookie("weibo_auth"))
-        except json.JSONDecodeError:
-            weibo_auth = None
-        except TypeError:
-            weibo_auth = None
+        weibo_auth = self.get_secure_cookie("weibo_auth")
+        logging.info(weibo_auth)
         return weibo_auth
     def _get_renren_auth(self):
-        try:
-            renren_auth = json.loads(self.get_secure_cookie("renren_auth"))
-        except json.JSONDecodeError:
-            renren_auth = None
-        except TypeError:
-            renren_auth = None
+        renren_auth = self.get_secure_cookie("renren_auth")
         return renren_auth
     def _get_tencent_auth(self):
-        try:
-            tencent_auth = json.loads(self.get_secure_cookie("tencent_auth"))
-        except json.JSONDecodeError:
-            tencent_auth = None
-        except TypeError:
-            tencent_auth = None
+        tencent_auth = self.get_secure_cookie("tencent_auth")
         return tencent_auth
     def get(self):
-        email = None
-        # Google Auth
-        auth_type, auth = self._get_auth()
+        auth_type, email = self._get_auth()
+        if auth_type == "weibo":
+            email = email + "@user.weibo.com"
+        elif auth_type == "renren":
+            email = email + "@user.renren.com"
+        elif auth_type == "tencent":
+            email = email + "@user.t.qq.com"
         self.render("account.signup.html", locals())
     def post(self):
         args = self.get_argument_list(["email", "username", "password"], \
@@ -181,6 +167,7 @@ class SigninRenrenHandler(BaseHandler, RenrenMixin, MemberDBMixin):
             self.set_secure_cookie("uid", str(auth.member_id))
             self.redirect("/")
             return
+        self.clear_all_cookies()
         self.set_secure_cookie("renren_auth", str(user['user']['id']))
         self.redirect("/signup")
     @tornado.web.asynchronous
@@ -202,6 +189,7 @@ class SigninTencentHandler(BaseHandler, TencentMixin, MemberDBMixin):
             self.set_secure_cookie("uid", str(auth.member_id))
             self.redirect("/")
             return
+        self.clear_all_cookies()
         self.set_secure_cookie("tencent_auth", user['access_token']['openid'])
         self.redirect('/signup')
     @tornado.web.asynchronous
@@ -241,6 +229,7 @@ class SigninWeiboHandler(BaseHandler, WeiboMixin, MemberDBMixin):
             self.set_secure_cookie("uid", str(auth.member_id))
             self.redirect("/")
             return
+        self.clear_all_cookies()
         self.set_secure_cookie("weibo_auth", str(user['id']))
         self.redirect('/signup')
 
