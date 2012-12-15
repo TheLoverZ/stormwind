@@ -1,3 +1,8 @@
 # -*- coding: utf-8 -*-
 
-filters = {}
+def welcome(username):
+    return "Hey, %s" % username 
+
+filters = {
+    'welcome' : welcome, 
+}

@@ -1,0 +1,80 @@
+html {
+    background: #E9E9E9; 
+}
+
+a {
+    text-decoration: none; 
+    color: #004BCF; 
+}
+
+a:hover {
+    text-decoration: underline; 
+}
+
+::-moz-selection {
+  color: #fff;
+  color: rgba(255, 255, 255, 0.85);
+  background: #ea4c89;
+}
+
+::selection {
+  color: #fff;
+  color: rgba(255, 255, 255, 0.85);
+  background: #ea4c89;
+}
+
+.left-column {
+    width: 300px; 
+    height: 100%; 
+    position: fixed; 
+    left: 0; 
+    top: 0; 
+}
+
+.logo {
+    color: #333; 
+    width: 60px; 
+    margin: 0 auto; 
+    margin-top: 30px; 
+}
+
+.logo h3 {
+    font-family: 'Grand Hotel', cursive;
+    font-size: 35px; 
+    font-weight: 600; 
+    display: inline-block; 
+    color: #777; 
+    line-height: 30px; 
+    margin: 0; 
+    padding: 0; 
+}
+
+.center-column {
+    width: 600px; 
+    margin-left: 300px; 
+}
+
+.nav ul {
+    margin: 0; 
+    padding: 0; 
+    list-style: none; 
+    margin-top: 50px; 
+}
+
+.nav ul li {
+    text-align: right; 
+    margin-right: 50px; 
+}
+
+.nav ul li a {
+    text-decoration: none; 
+    color: #666; 
+    padding: 10px 0; 
+    display: block; 
+}
+
+.center-column .newtohere {
+    margin-top: 300px; 
+    text-align: center; 
+    color: #777; 
+}
