@@ -66,7 +66,7 @@ class SigninGoogleHandler(BaseHandler, tornado.auth.GoogleMixin, MemberDBMixin):
             self.redirect("/")
             return
         self.set_secure_cookie("google_auth", json.dumps(user))
-        self.redirect("/signup/google")
+        self.redirect("/signup")
 
 class SignupHandler(BaseHandler, MemberDBMixin):
     def _get_auth(self):
@@ -158,7 +158,7 @@ class SignupHandler(BaseHandler, MemberDBMixin):
         member = Member(email, username, self.encrypt_password(password), self.get_browser_locale().code) 
         self.db.add(member)
         self.db.commit()
-        self.clear_cookie("google_auth")
+        self.clear_all_cookies()
         auth = self.create_auth(member.id)
         self.set_secure_cookie("auth", auth.secret)
         self.set_secure_cookie("uid", str(auth.member_id))
@@ -171,8 +171,15 @@ class SignoutHandler(BaseHandler):
 
 class SigninRenrenHandler(BaseHandler, RenrenMixin):
     def _on_auth(self, user):
-        logging.info(user)
-        self.finish()
+        member = self.select_member_by_renren_id(user['user']['id'])
+        if member:
+            auth = self.create_auth(member.id)
+            self.set_secure_cookie("auth", auth.secret)
+            self.set_secure_cookie("uid", str(auth.member_id))
+            self.redirect("/")
+            return
+        self.set_secure_cookie("renren_auth", user['user']['id'])
+        self.redirect("/signup")
     @tornado.web.asynchronous
     def get(self):
         callback_uri = self.settings['base_domain'] + '/signin/renren'
@@ -183,8 +190,15 @@ class SigninRenrenHandler(BaseHandler, RenrenMixin):
 
 class SigninTencentHandler(BaseHandler, TencentMixin):
     def _on_auth(self, user):
-        logging.info(user)
-        self.finish()
+        member = self.select_member_by_tencent_id(user['access_token']['openid'])
+        if member:
+            auth = self.create_auth(member.id)
+            self.set_secure_cookie("auth", auth.secret)
+            self.set_secure_cookie("uid", str(auth.member_id))
+            self.redirect("/")
+            return
+        self.set_secure_cookie("tencent_auth", user['access_token']['openid'])
+        self.redirect('/signup')
     @tornado.web.asynchronous
     def get(self):
         redirect_uri = self.settings['base_domain'] + '/signin/tencent'
@@ -213,8 +227,15 @@ class SigninWeiboHandler(BaseHandler, WeiboMixin):
                               client_id=self.settings["weibo_client_id"],
                               extra_params={"response_type": "code"})
     def _on_login(self, user):
-        logging.error(user)
-        self.finish()
+        member = self.select_member_by_weibo_id(user['id'])
+        if member:
+            auth = self.create_auth(member.id)
+            self.set_secure_cookie("auth", auth.secret)
+            self.set_secure_cookie("uid", str(auth.member_id))
+            self.redirect("/")
+            return
+        self.set_secure_cookie("weibo_auth", user['id'])
+        self.redirect('/signup')
 
 route = [
     (r'/signin', SigninHandler), 
@@ -223,6 +244,5 @@ route = [
     (r'/signin/tencent', SigninTencentHandler), 
     (r'/signin/weibo', SigninWeiboHandler), 
     (r'/signup', SignupHandler), 
-    (r'/signup/google', SignupHandler), 
     (r'/signout', SignoutHandler), 
 ]
