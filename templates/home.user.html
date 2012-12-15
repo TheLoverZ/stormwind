@@ -11,9 +11,9 @@
     </div>
     <div class="nav">
         <ul>
-            <li><a href="/u/{{ user.username }}">{{ user.username | title }}</a></li>
+            <li><a href="/u/{{ user.username }}">{{ user.username }}</a></li>
             <li><a href="/">Home</a></li>
-            <li><a href="#">Exlpore</a></li>
+            <li><a href="#">Explore</a></li>
         </ul>
     </div>
 </div>
@@ -23,7 +23,7 @@
     {% endfor %}
     {% else %}
     <div class="newtohere">
-        <p>{{ _('Wohaaa, nothing here now,') }}<a href="/new">{{ _('create one?') }}</a></p>
+        <p>{{ _('Wohaaa, nothing here now, ') }}<a href="/new">{{ _('create one?') }}</a></p>
     </div>
     {% endif %}
 </div>

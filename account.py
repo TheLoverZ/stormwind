@@ -87,13 +87,12 @@ class SignupHandler(BaseHandler, MemberDBMixin):
         tencent = self._get_tencent_auth()
         if tencent:
             return "tencent", tencent
-        return None
+        return '', None
     def _get_google_auth(self):
         google_auth = self.get_secure_cookie("google_auth")
         return google_auth
     def _get_weibo_auth(self):
         weibo_auth = self.get_secure_cookie("weibo_auth")
-        logging.info(weibo_auth)
         return weibo_auth
     def _get_renren_auth(self):
         renren_auth = self.get_secure_cookie("renren_auth")
